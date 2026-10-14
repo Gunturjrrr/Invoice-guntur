@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Invoice Otomatis</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .invoice-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      input, select, textarea {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        appearance: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen p-3 md:p-8">
+
+  <!-- Floating Action Bar (Hanya Muncul di Layar, Hilang Saat Di-print/PDF) -->
+  <div class="max-w-4xl mx-auto mb-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-lg">
+    <div>
+      <h1 class="text-xl font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-file-invoice text-indigo-400"></i> Generator Invoice Modern
+      </h1>
+      <p class="text-xs text-slate-400">Isi / ubah data di bawah, lalu klik Cetak / Export PDF</p>
+    </div>
+
+    <div class="flex gap-2 w-full sm:w-auto">
+      <button onclick="resetForm()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl transition-all">
+        <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+      </button>
+      <button onclick="window.print()" class="flex-1 sm:flex-none px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-file-pdf text-sm"></i> Export PDF / Cetak
+      </button>
+    </div>
+  </div>
+
+  <!-- INVOICE CONTAINER (Modern Card) -->
+  <div class="invoice-card max-w-4xl mx-auto bg-slate-800 text-slate-100 p-6 md:p-10 rounded-3xl border border-slate-700 shadow-2xl space-y-8">
+    
+    <!-- HEADER: LOGO & INFORMASI INVOICE -->
+    <div class="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-slate-700/80 pb-6">
+      
+      <!-- Data Penerbit / Penjual -->
+      <div class="space-y-2 w-full md:w-1/2">
+        <input type="text" id="seller-name" value="GUNTUR DIGITAL SERVICES" class="text-xl md:text-2xl font-black text-indigo-400 bg-transparent border-b border-dashed border-slate-700 focus:border-indigo-500 focus:outline-none w-full">
+        <input type="text" id="seller-address" value="Jl. Sudirman No. 123, Jakarta Selatan" class="text-xs text-slate-400 bg-transparent border-b border-transparent hover:border-slate-700 focus:border-indigo-500 focus:outline-none w-full">
+        <div class="flex gap-2 text-xs text-slate-400">
+          <input type="text" id="seller-email" value="guntur@example.com" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-indigo-500 focus:outline-none w-1/2">
+          <input type="text" id="seller-phone" value="+62 812-3456-7890" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-indigo-500 focus:outline-none w-1/2">
+        </div>
+      </div>
+
+      <!-- Detail Invoice -->
+      <div class="w-full md:w-auto text-left md:text-right space-y-1 bg-slate-900/50 md:bg-transparent p-4 md:p-0 rounded-2xl border border-slate-700/50 md:border-none">
+        <h2 class="text-2xl font-black tracking-widest text-slate-300 uppercase">INVOICE</h2>
+        <div class="text-xs space-y-1">
+          <div class="flex md:justify-end gap-2 items-center">
+            <span class="text-slate-400">No. Invoice:</span>
+            <input type="text" id="inv-number" class="font-bold text-white text-right bg-transparent border-b border-slate-700 focus:outline-none w-36">
+          </div>
+          <div class="flex md:justify-end gap-2 items-center">
+            <span class="text-slate-400">Tgl. Terbit:</span>
+            <input type="date" id="inv-date" class="text-slate-300 text-right bg-transparent border-b border-slate-700 focus:outline-none w-36">
+          </div>
+          <div class="flex md:justify-end gap-2 items-center">
+            <span class="text-slate-400">Jatuh Tempo:</span>
+            <input type="date" id="inv-due" class="text-slate-300 text-right bg-transparent border-b border-slate-700 focus:outline-none w-36">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DATA PEMBELI / CLIENT -->
+    <div class="bg-slate-900/60 p-4 md:p-5 rounded-2xl border border-slate-700/60 space-y-2">
+      <p class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Ditujukan Kepada (Pembeli):</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+        <div>
+          <label class="block text-[10px] text-slate-500 mb-0.5">Nama Perusahaan / Klien</label>
+          <input type="text" id="client-name" value="PT Klien Sejahtera Utama" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500 font-semibold">
+        </div>
+        <div>
+          <label class="block text-[10px] text-slate-500 mb-0.5">Up / Contact Person</label>
+          <input type="text" id="client-person" value="Bapak Budi Santoso" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div class="col-span-1 md:col-span-2">
+          <label class="block text-[10px] text-slate-500 mb-0.5">Alamat Klien</label>
+          <input type="text" id="client-address" value="Gedung Cyber 2, Lt. 15, Kuningan, Jakarta" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-300 focus:outline-none focus:border-indigo-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- TABEL ITEMS BARANG / JASA -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="border-b border-slate-700 text-slate-400 uppercase text-[10px]">
+            <th class="py-3 px-2">Deskripsi Barang / Jasa</th>
+            <th class="py-3 px-2 w-16 text-center">Qty</th>
+            <th class="py-3 px-2 w-32 text-right">Harga Satuan (Rp)</th>
+            <th class="py-3 px-2 w-32 text-right">Total (Rp)</th>
+            <th class="py-3 px-2 w-10 text-center no-print">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="items-body" class="divide-y divide-slate-700/50">
+          <!-- Item rows generated via JS -->
+        </tbody>
+      </table>
+
+      <!-- Button Tambah Baris (Hilang Saat Di-print) -->
+      <button onclick="addItem()" class="mt-4 no-print w-full py-2.5 border border-dashed border-slate-600 hover:border-indigo-500 text-slate-400 hover:text-indigo-400 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-plus"></i> Tambah Item Barang / Jasa
+      </button>
+    </div>
+
+    <!-- KALKULASI SUBTOTAL, PPN & TOTAL TAGIHAN -->
+    <div class="flex flex-col md:flex-row justify-between items-start gap-6 border-t border-slate-700/80 pt-6">
+      
+      <!-- Informasi Pembayaran (Rekening) -->
+      <div class="w-full md:w-1/2 space-y-2 bg-slate-900/40 p-4 rounded-2xl border border-slate-700/40 text-xs">
+        <p class="font-bold text-slate-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-credit-card text-indigo-400"></i> Informasi Pembayaran:
+        </p>
+        <div class="space-y-1 text-slate-400">
+          <div class="flex gap-2">
+            <span class="w-20">Bank:</span>
+            <input type="text" value="Bank BCA" class="bg-transparent border-b border-slate-700 text-slate-200 focus:outline-none">
+          </div>
+          <div class="flex gap-2">
+            <span class="w-20">No. Rekening:</span>
+            <input type="text" value="123-456-7890" class="bg-transparent border-b border-slate-700 text-slate-200 font-bold focus:outline-none">
+          </div>
+          <div class="flex gap-2">
+            <span class="w-20">Atas Nama:</span>
+            <input type="text" value="GUNTUR" class="bg-transparent border-b border-slate-700 text-slate-200 focus:outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Ringkasan Total Tagihan -->
+      <div class="w-full md:w-72 space-y-2 text-xs">
+        <div class="flex justify-between items-center py-1 text-slate-400">
+          <span>Subtotal:</span>
+          <span id="val-subtotal" class="font-semibold text-slate-200">Rp 0</span>
+        </div>
+
+        <div class="flex justify-between items-center py-1 text-slate-400">
+          <div class="flex items-center gap-1">
+            <span>PPN (%):</span>
+            <input type="number" id="tax-rate" value="11" oninput="calculateTotals()" class="w-12 bg-slate-900 border border-slate-700 text-center rounded text-slate-200 focus:outline-none no-print">
+            <span class="print-only" id="tax-rate-print">11%</span>
+          </div>
+          <span id="val-tax" class="font-semibold text-slate-200">Rp 0</span>
+        </div>
+
+        <div class="flex justify-between items-center py-3 border-t border-b border-slate-700 text-base font-bold">
+          <span class="text-white">TOTAL TAGIHAN:</span>
+          <span id="val-total" class="text-indigo-400 text-lg">Rp 0</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER & TANDA TANGAN -->
+    <div class="flex justify-between items-end border-t border-slate-700/50 pt-6 text-xs text-slate-400">
+      <div class="space-y-1">
+        <p class="font-semibold text-slate-300">Catatan:</p>
+        <textarea rows="2" class="w-full md:w-80 bg-transparent border border-slate-700/50 rounded-lg p-2 text-slate-400 focus:outline-none text-[11px]">Terima kasih atas kerja samanya. Harap konfirmasi pembayaran setelah transfer dilakukan.</textarea>
+      </div>
+
+      <div class="text-center space-y-10">
+        <p class="text-[11px]">Hormat Kami,</p>
+        <div class="border-b border-slate-600 w-36 mx-auto"></div>
+        <p class="font-bold text-slate-200 text-[11px]">( GUNTUR )</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Initial Items State
+    let items = [
+      { id: 1, desc: 'Jasa Pembuatan Web & Sistem Automasi', qty: 1, price: 5000000 },
+      { id: 2, name: 'Setup Cloud Server & Domain (1 Thn)', qty: 1, price: 1200000 }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set Default Auto-generated Dates & Inv Number
+      const today = new Date();
+      const dueDate = new Date();
+      dueDate.setDate(today.getDate() + 14);
+
+      document.getElementById('inv-date').value = today.toISOString().split('T')[0];
+      document.getElementById('inv-due').value = dueDate.toISOString().split('T')[0];
+      document.getElementById('inv-number').value = 'INV-' + today.getFullYear() + (today.getMonth()+1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0') + '-001';
+
+      renderItems();
+    });
+
+    // Helper Format Rupiah
+    function formatRp(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    // Render Rows Table
+    function renderItems() {
+      const tbody = document.getElementById('items-body');
+      tbody.innerHTML = '';
+
+      items.forEach((item, index) => {
+        const total = item.qty * item.price;
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/30 transition-all';
+        tr.innerHTML = `
+          <td class="py-2.5 px-2">
+            <input type="text" value="${item.desc || item.name}" onchange="updateItem(${index}, 'desc', this.value)" class="w-full bg-transparent border-b border-transparent hover:border-slate-700 focus:border-indigo-500 focus:outline-none text-slate-200">
+          </td>
+          <td class="py-2.5 px-2 text-center">
+            <input type="number" value="${item.qty}" min="1" oninput="updateItem(${index}, 'qty', this.value)" class="w-12 bg-slate-900 border border-slate-700 rounded text-center text-slate-200 focus:outline-none">
+          </td>
+          <td class="py-2.5 px-2 text-right">
+            <input type="number" value="${item.price}" oninput="updateItem(${index}, 'price', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded text-right px-2 text-slate-200 focus:outline-none">
+          </td>
+          <td class="py-2.5 px-2 text-right font-bold text-slate-200">
+            ${formatRp(total)}
+          </td>
+          <td class="py-2.5 px-2 text-center no-print">
+            <button onclick="removeItem(${index})" class="text-slate-500 hover:text-rose-400 p-1">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      calculateTotals();
+    }
+
+    // Add New Item Row
+    function addItem() {
+      items.push({ id: Date.now(), desc: 'Item Baru / Jasa', qty: 1, price: 0 });
+      renderItems();
+    }
+
+    // Update Item State
+    function updateItem(index, key, val) {
+      if (key === 'qty' || key === 'price') {
+        items[index][key] = parseFloat(val) || 0;
+      } else {
+        items[index][key] = val;
+      }
+      renderItems();
+    }
+
+    // Remove Item Row
+    function removeItem(index) {
+      if (items.length <= 1) {
+        alert("Invoice minimal memiliki 1 item barang/jasa.");
+        return;
+      }
+      items.splice(index, 1);
+      renderItems();
+    }
+
+    // Calculate Subtotal, Tax, Total
+    function calculateTotals() {
+      const subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+      const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+      const taxAmount = (subtotal * taxRate) / 100;
+      const total = subtotal + taxAmount;
+
+      document.getElementById('val-subtotal').innerText = formatRp(subtotal);
+      document.getElementById('val-tax').innerText = formatRp(taxAmount);
+      document.getElementById('val-total').innerText = formatRp(total);
+    }
+
+    // Reset Form Data
+    function resetForm() {
+      if (confirm("Reset seluruh isi invoice ke awal?")) {
+        items = [
+          { id: 1, desc: 'Jasa Pembuatan Web & Sistem Automasi', qty: 1, price: 5000000 },
+          { id: 2, desc: 'Setup Cloud Server & Domain (1 Thn)', qty: 1, price: 1200000 }
+        ];
+        renderItems();
+      }
+    }
+  </script>
+</body>
+</html>
